@@ -23,7 +23,7 @@
     <ProjectGuid>{A4D02776-8D98-47A7-8779-AFEC1BCA6492}</ProjectGuid>
     <RootNamespace>GapBuffer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
-    <ProjectName>GapBuffer Debug</ProjectName>
+    <ProjectName>GapBuffer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
