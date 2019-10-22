@@ -1,6 +1,7 @@
 #include "iterator.h"
 #include "GapBuffer.h"
 #include "Exception.h"
+#include "iterator_utilities.h"
 #include <algorithm>
 
 using namespace std;
@@ -80,7 +81,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	 if (IsIterOutOfRange(*this, ptr, '+', inc))
 		 ThrowOutOfRange();
 	 if (!BelongsToBuffer(ptr + inc)) {
-		 if (WillSkipGap(ptr, '+', inc))
+		 if (WillSkipGap(*this, '+', inc))
 			 inc += *gap_end - *gap_start;
 
 		 ret_iter.ptr = ptr + inc;
@@ -101,7 +102,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 		 ThrowOutOfRange();
 
 	 if (!BelongsToBuffer(ptr - dec)) {
-		 if (WillSkipGap(ptr, '-', dec))
+		 if (WillSkipGap(*this, '-', dec))
 			 dec += *gap_end - *gap_start;
 
 		 ret_iter.ptr = ptr - dec;
@@ -152,24 +153,6 @@ bool GapBuffer::iterator::BelongsToBuffer(vec_char_iter p) const {
 	auto gap_end_it = data_beg + (*gap_end);
 	if (p >= gap_start_it && p < gap_end_it)
 		return true;
-
-	return false;
-}
-
-//Recieves iterator, type of shift and shift constant. It checks will the
-//iterator skip the gap after such shift.
-bool GapBuffer::iterator::WillSkipGap(vec_char_iter ptr, const char& action, const int& shift) const {
-	//Exclude an empty gap case
-	if (gap_start == gap_end)
-		return false;
-
-	auto gps_iter = data_beg + *gap_start;
-	auto gpe_iter = data_beg + *gap_end;
-	if (action == '+') {
-		if (ptr < gps_iter && ptr + shift >= gpe_iter) return true;
-	}
-	else if (action == '-')
-		if (ptr >= gpe_iter && ptr - shift < gps_iter) return true;
 
 	return false;
 }

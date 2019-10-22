@@ -1,6 +1,7 @@
 #include "const_iterator.h"
 #include "GapBuffer.h"
 #include "Exception.h"
+#include "iterator_utilities.h"
 #include <algorithm>
 
 using namespace std;
@@ -81,7 +82,7 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 	if(IsIterOutOfRange(*this, ptr, '+', inc))
 	    ThrowOutOfRange();	
 	if (!BelongsToBuffer(ptr + inc)) {
-		if (WillSkipGap(ptr, '+', inc))
+		if (WillSkipGap(*this, '+', inc))
 			inc += *gap_end - *gap_start;
 		
 		ret_iter.ptr = ptr + inc;
@@ -102,7 +103,7 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 		 ThrowOutOfRange();
 
 	 if (!BelongsToBuffer(ptr - dec)){
-		 if (WillSkipGap(ptr, '-', dec))
+		 if (WillSkipGap(*this, '-', dec))
 			 dec += *gap_end - *gap_start;
 
 		 ret_iter.ptr = ptr - dec;
@@ -156,30 +157,3 @@ bool GapBuffer::const_iterator::BelongsToBuffer(vec_char_citer p) const {
 	return false;
 }
 
-//Recieves iterator, type of shift and shift constant. It checks will the
-//iterator skip the gap after such shift.
-bool GapBuffer::const_iterator::WillSkipGap(vec_char_citer ptr, const char& action, const int& shift) const {
-	//Exclude an empty gap case
-	if (gap_start == gap_end)
-		return false;
-
-  	auto gps_iter = data_beg + *gap_start;
-	auto gpe_iter = data_beg + *gap_end;
-	
-	auto PositGapSkip = [&](const int& shf) { return ptr < gps_iter && ptr + shf >= gpe_iter; };
-	auto NegatGapSkip = [&](const int& shf) { return ptr >= gpe_iter && ptr - shf < gps_iter; };
-
-	if (action == '+')
-		if (shift > 0)
-			return PositGapSkip(shift);
-		else
-			return NegatGapSkip(abs(shift));
-	
-	if (action == '-')
-		if (shift > 0)
-			return NegatGapSkip(shift);
-		else
-			return PositGapSkip(abs(shift));
-	
-	return false;
-}

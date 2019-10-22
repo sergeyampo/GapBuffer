@@ -3,6 +3,7 @@
 
 #include "GapBuffer.h"
 #include "Exception.h"
+#include "iterator_utilities.h"
 #include <vector>
 
 //Iterator allows to navigate through the data skipping a gap buffer
@@ -47,10 +48,12 @@ class GapBuffer::iterator {
 
 	template<typename GAPIt, typename It>
 	friend bool IsIterOutOfRange<GAPIt, It>(GAPIt, It, const char&, const int&);
+	
+	template<typename GAPIt>
+	friend bool WillSkipGap<GAPIt>(GAPIt, const char&, const int&);
 
   private:
 	bool BelongsToBuffer(vec_char_iter) const;
-	bool WillSkipGap(vec_char_iter, const char&, const int&) const;
 
   private:
 	vec_char_iter data_beg;                      //Iterator points to the start of common storage
