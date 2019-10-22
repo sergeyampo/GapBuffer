@@ -75,7 +75,6 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 	return distance;
 }
 
- //Если буффер впереди, и мы собираемся его перескочить добавим его длину в результат.
 //Positive shift iterator
  GapBuffer::const_iterator GapBuffer::const_iterator::operator+(size_type inc) const {
 	const_iterator ret_iter(*this);
@@ -166,11 +165,21 @@ bool GapBuffer::const_iterator::WillSkipGap(vec_char_citer ptr, const char& acti
 
   	auto gps_iter = data_beg + *gap_start;
 	auto gpe_iter = data_beg + *gap_end;
-	if (action == '+') {
-		if (ptr < gps_iter && ptr + shift >= gpe_iter) return true;	    
-	}
-	else if (action == '-')
-		if (ptr >= gpe_iter && ptr - shift < gps_iter) return true;
+	
+	auto PositGapSkip = [&](const int& shf) { return ptr < gps_iter && ptr + shf >= gpe_iter; };
+	auto NegatGapSkip = [&](const int& shf) { return ptr >= gpe_iter && ptr - shf < gps_iter; };
+
+	if (action == '+')
+		if (shift > 0)
+			return PositGapSkip(shift);
+		else
+			return NegatGapSkip(abs(shift));
+	
+	if (action == '-')
+		if (shift > 0)
+			return NegatGapSkip(shift);
+		else
+			return PositGapSkip(abs(shift));
 	
 	return false;
 }

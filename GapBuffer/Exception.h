@@ -10,6 +10,9 @@ inline void ThrowOutOfRange() noexcept(false) {
 		"position after the \0 symbol");
 }
 
+//Function tells us may our action of moving iterator cause
+//out of range exception throwing. Recieves instruction like:
+//IsIterOutOfRange(GapBuffer::(const_)iterator, vector<char>::(const_)iterator belongs to first argument, '+'('-'), 10(number))
 template<typename GAPIt, typename It>
 inline bool IsIterOutOfRange(GAPIt base, It iter, const char& act, const int& shift) {
 	auto NegatShift = [&](const int& shf) -> bool {
