@@ -30,4 +30,16 @@ inline bool WillSkipGap(GAPIt it, const char& action, const int& shift){
 	return false;
 }
 
+//Recieves base GapBuffer iterator and its vector<char>::(const_)iterator and check
+//if the iterator belongs to GapBuffer.
+template <typename GAPIt, typename Iter>
+bool BelongsToBuffer(GAPIt base, Iter p){
+	auto gap_start_it = base.data_beg + *(base.gap_start);
+	auto gap_end_it = base.data_beg + *(base.gap_end);
+	if (p >= gap_start_it && p < gap_end_it)
+		return true;
+
+	return false;
+}
+
 #endif

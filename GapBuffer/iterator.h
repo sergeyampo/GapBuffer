@@ -53,7 +53,8 @@ class GapBuffer::iterator {
 	friend bool WillSkipGap<GAPIt>(GAPIt, const char&, const int&);
 
   private:
-	bool BelongsToBuffer(vec_char_iter) const;
+	template <typename GAPIt, typename Iter>
+	friend bool BelongsToBuffer(GAPIt, Iter);
 
   private:
 	vec_char_iter data_beg;                      //Iterator points to the start of common storage

@@ -9,7 +9,7 @@ using namespace std;
 //iterator constructor, checking not first element is in a gap buffer
 //if it is incrementing it from this. Also, initializing reference in the intializer list is very important.
 GapBuffer::iterator::iterator(vec_char_iter beg, vec_char_iter end, vec_char_iter p, size_type* gap_s, size_type* gap_e) : data_beg(beg), data_end(end), ptr(p), gap_start(gap_s), gap_end(gap_e) {
-	if (BelongsToBuffer(p))
+	if (BelongsToBuffer(*this, p))
 		++(*this);
 }
 
@@ -17,7 +17,7 @@ GapBuffer::iterator::iterator(vec_char_iter beg, vec_char_iter end, vec_char_ite
  GapBuffer::iterator& GapBuffer::iterator::operator++() {
 	 if (IsIterOutOfRange(*this, ptr, '+', 1))
 		 ThrowOutOfRange();
-	 if (!BelongsToBuffer(ptr + 1))
+	 if (!BelongsToBuffer(*this, ptr + 1))
 		++ptr;
 	 else {
 		 auto gpe_index = *gap_end;
@@ -40,7 +40,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	if (IsIterOutOfRange(*this, ptr, '-', 1))
 		ThrowOutOfRange();
 
-	if (!BelongsToBuffer(ptr - 1)) {
+	if (!BelongsToBuffer(*this, ptr - 1)) {
 		--ptr;
 	}
 	else {
@@ -80,7 +80,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	iterator ret_iter(*this);
 	 if (IsIterOutOfRange(*this, ptr, '+', inc))
 		 ThrowOutOfRange();
-	 if (!BelongsToBuffer(ptr + inc)) {
+	 if (!BelongsToBuffer(*this, ptr + inc)) {
 		 if (WillSkipGap(*this, '+', inc))
 			 inc += *gap_end - *gap_start;
 
@@ -101,7 +101,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	 if (IsIterOutOfRange(*this, ptr, '-', dec))
 		 ThrowOutOfRange();
 
-	 if (!BelongsToBuffer(ptr - dec)) {
+	 if (!BelongsToBuffer(*this, ptr - dec)) {
 		 if (WillSkipGap(*this, '-', dec))
 			 dec += *gap_end - *gap_start;
 
@@ -145,15 +145,5 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 
  GapBuffer::iterator::pointer GapBuffer::iterator::operator->() const {
 	return &(*ptr);
-}
-
-//Recieves iterator and check if the iterator belongs to GapBuffer
-bool GapBuffer::iterator::BelongsToBuffer(vec_char_iter p) const {
-	auto gap_start_it = data_beg + (*gap_start);
-	auto gap_end_it = data_beg + (*gap_end);
-	if (p >= gap_start_it && p < gap_end_it)
-		return true;
-
-	return false;
 }
 
