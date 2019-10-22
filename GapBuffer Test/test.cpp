@@ -278,3 +278,21 @@ TEST_F(ConstIteratorTest, CompoundOperators) {
 	EXPECT_THROW(*(beg_third += 2), out_of_range);
 	EXPECT_EQ(*(end_fourth -= 10'001), '+');
 }
+
+TEST_F(ConstIteratorTest, AccessOperators) {
+	EXPECT_EQ(beg_first[4], 'g');
+	EXPECT_EQ(beg_fourth[10'500], '+');
+	
+	GapBuffer::const_iterator it_test = beg_third;
+	EXPECT_EQ(*it_test, '1');
+	EXPECT_EQ(it_test[1], '9');
+	ASSERT_EQ(*beg_third, '1');
+}
+
+TEST_F(ConstIteratorTest, ComparisonOperators) {
+	GapBuffer::const_iterator beg_f_cpy = beg_first;
+	EXPECT_EQ(beg_f_cpy, beg_first);
+	EXPECT_GE(beg_f_cpy + 5, end_first - 3);
+	EXPECT_LE(end_third - 2, beg_third);
+	EXPECT_NE(end_fourth - 5'000, beg_fourth + 5'000);
+}
