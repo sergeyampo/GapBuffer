@@ -27,6 +27,7 @@ GapBuffer::iterator GapBuffer::ConstIterToIter(GapBuffer::const_iterator citer) 
 void GapBuffer::GapMoveLeft(const size_type& index) {
 	auto beg = std::begin(data) + index;
 	copy(beg, beg + (gap_start - index), beg + GapSize());
+//	std::memcpy(&*(beg + GapSize()), &*beg, gap_start - index); - slowly
 	gap_end -= (gap_start - index);
 	gap_start = index;
 }
@@ -36,6 +37,7 @@ void GapBuffer::GapMoveLeft(const size_type& index) {
 void GapBuffer::GapMoveRight(const size_type& index) {
 	auto beg = std::begin(data);
 	copy(beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
+//	memcpy(&*(beg + gap_start), &*(beg + gap_end), index + 1 - gap_end); - slowly
 	gap_start += (index - gap_end);
 	gap_end = index;
 }
@@ -118,7 +120,7 @@ void GapBuffer::Move(size_type index) {
 	if (index > Size())
 		throw invalid_argument("Incorrect index.");
 
-	static const size_type expans_factor = 2;          //The capacity of storage expansion
+	static constexpr const size_type expans_factor = 2;          //The capacity of storage expansion
 	if (IsGapEmpty())
 		ExpandStorage(expans_factor * StorageSize());
 
