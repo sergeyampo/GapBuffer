@@ -39,6 +39,29 @@ bool IsGapPairEqual(const pair<size_t, size_t>& lhs, const pair<size_t, size_t>&
 
 //It's not rational to create GapBufferTest object every time we're calling
 //TEST_F function but it's the only way to reduce code ih these tests.
+
+TEST_F(GapBufferTest, Constructing) {
+	//Check for independency of copy
+	GapBuffer gp_cpy(gp_first.begin(), gp_first.end());
+	gp_first.Erase(gp_first.begin());
+	EXPECT_NE(*begin(gp_first), *begin(gp_cpy));
+	EXPECT_EQ(*begin(gp_cpy), 'a');
+	//Check for correct construct by iterators
+	EXPECT_EQ("abcdgh", string(gp_cpy.begin(), gp_cpy.end()));
+	EXPECT_EQ("19", string(gp_third.begin(), gp_third.end()));
+
+	auto gp_data = gp_third.getGapData();
+	EXPECT_EQ("1*******9", string(gp_data.begin(), find(gp_data.begin(), gp_data.end(), '\0')));
+}
+TEST_F(GapBufferTest, Concepts) {
+	EXPECT_TRUE(is_copy_constructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_copy_assignable<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_destructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_default_constructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_swappable<decltype(gp_first)>::value);
+	bool is_asgn = is_assignable<decltype(gp_first), decltype(gp_first)>::value;
+	EXPECT_TRUE(is_asgn);
+}
 TEST_F(GapBufferTest, 1_InsertByIndex) {
 	gp_first.Insert(4, 'e');
 	gp_first.Insert(5, 'f');
