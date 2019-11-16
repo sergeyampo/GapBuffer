@@ -39,6 +39,29 @@ bool IsGapPairEqual(const pair<size_t, size_t>& lhs, const pair<size_t, size_t>&
 
 //It's not rational to create GapBufferTest object every time we're calling
 //TEST_F function but it's the only way to reduce code ih these tests.
+
+TEST_F(GapBufferTest, Constructing) {
+	//Check for independency of copy
+	GapBuffer gp_cpy(gp_first.begin(), gp_first.end());
+	gp_first.Erase(gp_first.begin());
+	EXPECT_NE(*begin(gp_first), *begin(gp_cpy));
+	EXPECT_EQ(*begin(gp_cpy), 'a');
+	//Check for correct construct by iterators
+	EXPECT_EQ("abcdgh", string(gp_cpy.begin(), gp_cpy.end()));
+	EXPECT_EQ("19", string(gp_third.begin(), gp_third.end()));
+
+	auto gp_data = gp_third.getGapData();
+	EXPECT_EQ("1*******9", string(gp_data.begin(), find(gp_data.begin(), gp_data.end(), '\0')));
+}
+TEST_F(GapBufferTest, Concepts) {
+	EXPECT_TRUE(is_copy_constructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_copy_assignable<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_destructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_default_constructible<decltype(gp_first)>::value);
+	EXPECT_TRUE(is_swappable<decltype(gp_first)>::value);
+	bool is_asgn = is_assignable<decltype(gp_first), decltype(gp_first)>::value;
+	EXPECT_TRUE(is_asgn);
+}
 TEST_F(GapBufferTest, 1_InsertByIndex) {
 	gp_first.Insert(4, 'e');
 	gp_first.Insert(5, 'f');
@@ -277,4 +300,135 @@ TEST_F(ConstIteratorTest, CompoundOperators) {
 	EXPECT_EQ(*(beg_third += 1), '9');
 	EXPECT_THROW(*(beg_third += 2), out_of_range);
 	EXPECT_EQ(*(end_fourth -= 10'001), '+');
+}
+
+TEST_F(ConstIteratorTest, AccessOperators) {
+	EXPECT_EQ(beg_first[4], 'g');
+	EXPECT_EQ(beg_fourth[10'500], '+');
+	
+	GapBuffer::const_iterator it_test = beg_third;
+	EXPECT_EQ(*it_test, '1');
+	EXPECT_EQ(it_test[1], '9');
+	ASSERT_EQ(*beg_third, '1');
+}
+
+TEST_F(ConstIteratorTest, ComparisonOperators) {
+	GapBuffer::const_iterator beg_f_cpy = beg_first;
+	EXPECT_EQ(beg_f_cpy, beg_first);
+	EXPECT_GE(beg_f_cpy + 5, end_first - 3);
+	EXPECT_LE(end_third - 2, beg_third);
+	EXPECT_NE(end_fourth - 5'000, beg_fourth + 5'000);
+}
+
+
+class IteratorTest : public GapBufferTest {
+protected:
+	void SetUp() override {
+		GapBufferTest::SetUp();
+		beg_first = begin(GapBufferTest::gp_first);
+		end_first = end(GapBufferTest::gp_first);
+		beg_second = begin(GapBufferTest::gp_second);
+		end_second = end(GapBufferTest::gp_second);
+		beg_third = begin(GapBufferTest::gp_third);
+		end_third = end(GapBufferTest::gp_third);
+		beg_fourth = begin(GapBufferTest::gp_fourth);
+		end_fourth = end(GapBufferTest::gp_fourth);
+	}
+
+	//	void TearDown() override {}
+
+	GapBuffer::iterator beg_first, end_first;
+	GapBuffer::iterator beg_second, end_second;
+	GapBuffer::iterator beg_third, end_third;
+	GapBuffer::iterator beg_fourth, end_fourth;
+};
+
+TEST_F(IteratorTest, ConceptsIter) {
+	EXPECT_TRUE(is_copy_constructible<decltype(beg_first)>::value);
+	EXPECT_TRUE(is_copy_assignable<decltype(beg_second)>::value);
+	EXPECT_TRUE(is_destructible<decltype(beg_third)>::value);
+	EXPECT_TRUE(is_default_constructible<decltype(beg_fourth)>::value);
+	EXPECT_TRUE(is_swappable<decltype(end_first)>::value);
+}
+
+TEST_F(IteratorTest, Construct) {
+	EXPECT_EQ(*beg_second, *(gp_second.getGapData().begin() + 2)) << "Iterator points to the wrong place.";
+
+	GapBuffer::iterator fourth_cpy(beg_fourth);
+	EXPECT_EQ(fourth_cpy, beg_fourth) << "Copy constructor doesn't work properly.";
+}
+
+TEST_F(IteratorTest, Increment) {
+	EXPECT_EQ(*(++beg_first), 'b');
+	EXPECT_EQ(*(beg_first++), 'b');
+	EXPECT_EQ(*beg_first, 'c');
+
+	EXPECT_EQ(*(++beg_second), '4');
+	EXPECT_THROW(++end_third, out_of_range);
+}
+
+TEST_F(IteratorTest, Decrement) {
+	EXPECT_THROW(--beg_second, out_of_range);
+	EXPECT_EQ(--end_third, (beg_third + 1));
+	EXPECT_EQ(--end_third, beg_third);
+	EXPECT_EQ(*(--end_first), 'h');
+	EXPECT_EQ(*beg_first, 'a');
+	EXPECT_THROW(beg_first - 2, out_of_range);
+
+}
+
+TEST_F(IteratorTest, SubtractIter) {
+	EXPECT_EQ(end_first - beg_first, 6);
+	EXPECT_EQ(end_second - beg_second, 7);
+	EXPECT_EQ(end_third - beg_third, 2);
+	EXPECT_EQ(end_fourth - beg_fourth, 15'500);
+}
+
+TEST_F(IteratorTest, SubtractNumber) {
+	EXPECT_EQ(*(end_first - 3), 'd');
+	ASSERT_THROW(end_second - 8, out_of_range);
+	EXPECT_EQ(*(end_second - 2), '8');
+	EXPECT_EQ(*(end_first - 5), 'b');
+	EXPECT_EQ(*(end_third - 2), '1');
+	EXPECT_EQ(*(end_fourth - 15'000), '+');
+}
+
+TEST_F(IteratorTest, ShiftPositive) {
+	EXPECT_EQ(*(beg_first + 4), 'g');
+	ASSERT_EQ(beg_first + 6, end_first);
+	EXPECT_THROW(beg_second + 8, out_of_range);
+	EXPECT_EQ(*(beg_third + 1), '9');
+	EXPECT_EQ(*(beg_fourth + 15'000), '+');
+
+	GapBuffer test_gap;
+	test_gap.setNewData("****", 0, 4);
+	EXPECT_EQ(begin(test_gap), end(test_gap))
+		;
+	EXPECT_THROW(begin(test_gap) + 1, out_of_range) << "Data contains only gap doesn't work correctly with iterators";
+}
+
+TEST_F(IteratorTest, CompoundOperators) {
+	EXPECT_EQ(*(beg_first += 5), 'h');
+	EXPECT_EQ(*(end_second -= 7), '3');
+	EXPECT_EQ(*(beg_third += 1), '9');
+	EXPECT_THROW(*(beg_third += 2), out_of_range);
+	EXPECT_EQ(*(end_fourth -= 10'001), '+');
+}
+
+TEST_F(IteratorTest, AccessOperators) {
+	EXPECT_EQ(beg_first[4], 'g');
+	EXPECT_EQ(beg_fourth[10'500], '+');
+
+	GapBuffer::iterator it_test = beg_third;
+	EXPECT_EQ(*it_test, '1');
+	EXPECT_EQ(it_test[1], '9');
+	ASSERT_EQ(*beg_third, '1');
+}
+
+TEST_F(IteratorTest, ComparisonOperators) {
+	GapBuffer::iterator beg_f_cpy = beg_first;
+	EXPECT_EQ(beg_f_cpy, beg_first);
+	EXPECT_GE(beg_f_cpy + 5, end_first - 3);
+	EXPECT_LE(end_third - 2, beg_third);
+	EXPECT_NE(end_fourth - 5'000, beg_fourth + 5'000);
 }

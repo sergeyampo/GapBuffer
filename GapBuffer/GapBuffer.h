@@ -20,9 +20,10 @@ class GapBuffer {
 	using pointer = std::vector<char>::pointer;
 	using const_pointer = std::vector<char>::const_pointer;
 
-	//Constructors, destructors
+	//Constructors, destructor
 	GapBuffer() : gap_start(0), gap_end(1), data(1) { }
 	explicit GapBuffer(const size_t& size) : gap_start(0), gap_end(size), data(size) { }
+	GapBuffer(const GapBuffer&) = default;
 	template <typename It> GapBuffer(It, It);                                       //Construct the data from iterator It points to char.
 	GapBuffer(GapBuffer&&) = default;
    ~GapBuffer() = default;
@@ -62,9 +63,11 @@ class GapBuffer {
 		gap_start = gap_s;
 		gap_end = gap_e;
 	}
+	//DEBUG
 	std::pair<size_t, size_t> getGapPos() {
 		return { gap_start, gap_end };
 	}
+	//DEBUG
 	std::vector<char> getGapData() {
 		return data;
 	}
