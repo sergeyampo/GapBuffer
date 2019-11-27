@@ -3,46 +3,71 @@
 #include "const_iterator.h"
 #include <algorithm>
 #include <stdexcept>
+#include <execution>
 
 using namespace std;
 
-//Recieve a size of the new storage. Reallocate new storage with match size.
+/**
+* @brief Expanding vector<char> which contains all our characters and gap space, make new gap space 
+* now the buffer points to new uninitialized elements at the end of the container.
+* @param new_size is the the size of new storage to reallocate.
+* @throws std::invalid_argument thrown if passed `new_size` less than current vector<char> size.
+* 
+*/
 void GapBuffer::ExpandStorage(const size_type& new_size) {
 	size_type old_size = data.size();
+	if (new_size <= data.size())
+		throw std::invalid_argument("The size of the storage is to be expanded can't be less than current size.");
+
 	data.resize(new_size);
 	gap_start = old_size;
-	gap_end = StorageSize();
+	gap_end = new_size;
 }
 
-//Function transforms const_iterator to iterator as usual way by moving
-//new iterator to the same position.
+
+/**
+* @brief Transforms const_iterator to iterator.
+* @details Transforms by moving iterator to const_iterator position. 
+* @param citer const_iterator to be transformed
+* @return transformed iterator
+*/
 GapBuffer::iterator GapBuffer::ConstIterToIter(GapBuffer::const_iterator citer) {
 	auto new_ptr(std::begin(data));
 	advance(new_ptr, distance(std::cbegin(data), citer.ptr));
 	return { std::begin(data), std::end(data), new_ptr, citer.gap_start, citer.gap_end };
 }
 
-//Recieve a move position index. Move a gap buffer to a match position.
-//It uses a logic to move buffer to the left.
+/**
+* @brief Moves gap space left and shifts all the characters which shouldn't get to the gap.
+* @param index position of the gap_start where gap space will be moved.
+*/
 void GapBuffer::GapMoveLeft(const size_type& index) {
 	auto beg = std::begin(data) + index;
-	copy(beg, beg + (gap_start - index), beg + GapSize());
-//	std::memcpy(&*(beg + GapSize()), &*beg, gap_start - index); - slowly
+	copy(std::execution::par_unseq, beg, beg + (gap_start - index), beg + GapSize());
 	gap_end -= (gap_start - index);
 	gap_start = index;
 }
 
-//Recieve a move position index. Move a gap buffer to a match position.
-//It uses a logic to move buffer to the right.
+
+/**
+* @brief Moves gap space right and shifts all the characters which shouldn't get to the gap.
+* @param index position of the gap_start where gap space will be moved.
+*/
 void GapBuffer::GapMoveRight(const size_type& index) {
 	auto beg = std::begin(data);
-	copy(beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
-//	memcpy(&*(beg + gap_start), &*(beg + gap_end), index + 1 - gap_end); - slowly
+	copy(std::execution::par_unseq, beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
 	gap_start += (index - gap_end);
 	gap_end = index;
 }
 
-//Recieve the index and symbol. It inserts the symbol in the index position.
+
+/**
+* @brief Inserts character in a certain index. We don't consider gap space.
+* @details Move gap buffer to the certain index, adding a character to the vector<char> and reducing gap_buffer.
+* @see GapBuffer::Move()
+* @param index - position where character will be inserted.
+* @param item - character to insert.
+*/
 void GapBuffer::Insert(const size_type& index, const char& item) {
 	Move(index);
 
@@ -50,8 +75,12 @@ void GapBuffer::Insert(const size_type& index, const char& item) {
 	++gap_start;
 }
 
-//Recieve the const_iterator and symbol. It inserts the symbol before the iterator position.
-//Returns nothing because iterator cannot points to the gap buffer.
+/**
+* @brief Inserts character like the GapBuffer::Insert(const size_type&, const char&) does.
+* @see GapBuffer::Insert(const size_type&, const char&)
+* @param pos - iterator points to the element before the insert occurs.
+* @detail We don't return anything because
+*/
 void GapBuffer::Insert(const_iterator pos, const char& item){
   const auto index = pos - std::cbegin(*this);
   Move(index);
@@ -60,8 +89,12 @@ void GapBuffer::Insert(const_iterator pos, const char& item){
   ++gap_start;
 }
 
-//Recieve the const_iterator which points to the element in data, remove this element.
-//Returns the iterator points to the next element.
+/**
+* @brief Erase character at position `to_del` iterator points to.
+* @param to_del - iterator points to the element we're going to erase.
+* @return not constant iterator like STL container does points to the next element.
+* @throws std::out_of_range thrown if `to_del` >= cend(ThisGapBufferObject)'
+*/
 GapBuffer::iterator GapBuffer::Erase(const_iterator to_del) {
 //Such calculations needs to be done for avoiding an iterator to_del
 //be in a gap buffer after the deletion, we should know its real position
@@ -78,9 +111,13 @@ GapBuffer::iterator GapBuffer::Erase(const_iterator to_del) {
 }
 
 //Recieve the iterator which points to the element in data, remove this element.
-//Returns the iterator points to the next element.
+/**
+* @brief Erase character at position `to_del` iterator points to.
+* @param to_del - iterator points to the element we're going to erase.
+* @return GapBuffer::iterator - non constant iterator like STL container does points to the next element.
+* @throws std::out_of_range thrown if `to_del` >= end(ThisGapBufferObject)
+*/
 GapBuffer::iterator GapBuffer::Erase(iterator to_del) {
-//Read Erase(const_iterator) declaration
 	auto shift_del_iter = to_del - std::begin(*this);
 	RemoveAt(shift_del_iter);
 	auto next_iter = std::begin(*this) + shift_del_iter;
@@ -91,8 +128,15 @@ GapBuffer::iterator GapBuffer::Erase(iterator to_del) {
 	return to_del;
 }
 
-//Recieve the iterator range, remove elements in the range [).
-//Returns the iterator points to the next element after the last deleted.
+
+/**
+* @brief Remove a bunch of characters in index range [).
+* @detail Remove range of characters by expanding gap space.
+* @param beg - iterator points to the beginning of the range to be deleted.
+* @param end - iterator points to the end of the range to be deleted.
+* @return `end` iterator - next element after the deleted.
+* @throws std::out_of_range thrown if `end` >= end(ThisGapBufferObject)
+*/
 GapBuffer::iterator GapBuffer::Erase(iterator beg, iterator end) {
 	auto beg_data = std::begin(*this);
 	RemoveRange(beg - beg_data, end - beg_data);
@@ -102,8 +146,14 @@ GapBuffer::iterator GapBuffer::Erase(iterator beg, iterator end) {
 	return end;
 }
 
-//Recieve the const_iterator range, remove elements in the range [).
-//Returns the iterator points to the next element after the last deleted.
+/**
+* @brief Remove a bunch of characters in index range [).
+* @detail Remove range of characters by expanding gap space.
+* @param beg - iterator points to the beginning of the range to be deleted.
+* @param end - iterator points to the end of the range to be deleted.
+* @return `end` iterator - next element after the deleted.
+* @throws std::out_of_range thrown if `end` >= cend(ThisGapBufferObject)
+*/
 GapBuffer::iterator GapBuffer::Erase(const_iterator beg, const_iterator end) {
 	auto beg_data = std::cbegin(*this);
 	RemoveRange(beg - beg_data, end - beg_data);
@@ -114,8 +164,13 @@ GapBuffer::iterator GapBuffer::Erase(const_iterator beg, const_iterator end) {
 }
 
 
-//Recieve the index of the character which we want gap buffer to be moved.
-//Source word symbol index.
+/**
+* @brief Move gap space to the `index` position shifting all the characters in that positions.
+* @param index - position where gap space have to be moved.
+* @throws invalid_argument thrown if the index will move gap space out of range.
+* @details `index` represents real position like we don't have any buffers in a string. "ab[***]cd" - string with a
+* gap space on [2]-[5] position in a real storage but if we pass `index` as [2] we'll move gap to 'c' position. 
+*/
 void GapBuffer::Move(size_type index) {
 	if (index > Size())
 		throw invalid_argument("Incorrect index.");
@@ -140,38 +195,62 @@ void GapBuffer::Move(size_type index) {
 	return;
 }
 
-//Recieves the index of character(without gap) and removes it by removal
-//of the gap buffer.
+/**
+* @brief Remove character at `index` position by expanding gap space.
+* @param index Position of the character to be removed.
+*/
 void GapBuffer::RemoveAt(const size_type& index) {
 	Move(index);
 	++gap_end;
 }
 
-//Recieves the range of the characters by the indexes and remove it as a previous method does.
+/**
+* @brief Remove a bunch of characters in index range.
+* @detail If the gap space is moved to the right position, characters'll be removed in time complexity O(1).
+* @param beg - position of the beginning of the range to remove.
+* @param end - position of the end of the range to remove.
+*/
 void GapBuffer::RemoveRange(const size_type& beg, const size_type& end) {
 	Move(beg);
 	gap_end += (end - beg);
 }
 
-//Method delegate responsible for iterator::ptr initialization not in a gap to an appropriate constructor
+/**
+* @brief Returns constant iterator pointing to the beginning of the string.
+* @see GapBuffer::const_iterator
+* @return GapBuffer::const_iterator
+*/
 GapBuffer::const_iterator GapBuffer::begin() const {
 	return { std::cbegin(data), std::cend(data), std::cbegin(data), const_cast<size_type*>(&gap_start), const_cast<size_type*>(&gap_end) };
 }
 
-//Method considers the fact that end const_iterator::ptr have to point to the element
-//after the last real character that's why we're searching null-symbol if it doesn't exist
-//we'll get end iterator.
+/**
+* @brief Returns constant iterator pointing to the next after the last character of the string.
+* @see GapBuffer::iterator
+* @details Method considers the fact that end GapBuffer::const_iterator::ptr have to point to the element
+* after the last character, that's why we're searching for null-symbol.
+* @return GapBuffer::const_iterator
+*/
 GapBuffer::const_iterator GapBuffer::end() const {
-	return { std::cbegin(data), std::cend(data), std::find(std::cbegin(data), std::cend(data), '\0'), const_cast<size_type*>(&gap_start), const_cast<size_type*>(&gap_end) };
+	return { std::cbegin(data), std::cend(data), std::find(std::execution::par_unseq, std::cbegin(data), std::cend(data), '\0'), const_cast<size_type*>(&gap_start), const_cast<size_type*>(&gap_end) };
 }
 
+/**
+* @brief Returns iterator pointing to the beginning of the string.
+* @see GapBuffer::iterator
+* @return GapBuffer::iterator
+*/
 GapBuffer::iterator GapBuffer::begin() {
 	return { std::begin(data), std::end(data), std::begin(data), &gap_start, &gap_end };
 }
 
-//Method considers the fact that end iterator::ptr have to point to the element
-//after the last real character that's why we're searching null-symbol if it doesn't exist
-//we'll get end iterator.
+/**
+* @brief Returns iterator pointing to the beginning of the string.
+* @see GapBuffer::iterator
+* @details Method considers the fact that end GapBuffer::iterator::ptr have to point to the element
+* after the last character, that's why we're searching for null-symbol.
+* @return GapBuffer::iterator
+*/
 GapBuffer::iterator GapBuffer::end() {
 	return { std::begin(data), std::end(data), std::find(std::begin(data), std::end(data), '\0'), &gap_start, &gap_end };
 }
