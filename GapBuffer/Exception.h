@@ -14,9 +14,6 @@ inline void ThrowOutOfRange() noexcept(false) {
 		"position after the \0 symbol");
 }
 
-//Function tells us may our action of moving iterator cause
-//out of range exception throwing. Recieves instruction like:
-//IsIterOutOfRange(GapBuffer::(const_)iterator, vector<char>::(const_)iterator belongs to first argument, '+'('-'), 10(number))
 /**
 * @brief Function tells us may our action of moving iterator cause out of range exception throwing.
 * @details It's used only by iterators which provide UB in cases like this one: some_iter::operator+(-10).
@@ -26,8 +23,8 @@ inline void ThrowOutOfRange() noexcept(false) {
 * @tparam It - vector<char>::const_iterator or vector<char>::iterator.
 * @param base - GapBuffer::iterator or const_iterator object keeping `iter` iterator.
 * @param act - '+' or '-' character.
-* @param shift - number of elements	`iter` should be advanced.
-* @return bool - the status of whether the shifting wil be successful.
+* @param shift - number of elements	`iter` should be shifted.
+* @return bool - the status of whether the shift wil be successful.
 */
 template<typename GAPIt, typename It>
 inline bool IsIterOutOfRange(GAPIt base, It iter, const char& act, const int& shift) {

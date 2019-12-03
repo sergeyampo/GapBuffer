@@ -3,17 +3,28 @@
 #include "Exception.h"
 #include "iterator_utilities.h"
 #include <algorithm>
+#include <tuple>
 
 using namespace std;
 
-//iterator constructor, checking not first element is in a gap buffer
-//if it is incrementing it from this. Also, initializing reference in the intializer list is very important.
+/**
+* @brief Constructor, checking for the constructed iterator is not in a gap space.
+* @param beg - vector<char>::iterator => (GapBuffer::data.cbegin())
+* @param end - vector<char>::iterator => (GapBuffer::data.cend())
+* @param ptr - vector<char>::iterator points to the current position of the object.
+* @param gap_s - size_type* => (GapBuffer::gap_start)
+* @param gap_e - size_type* => (GapBuffer::gap_end)
+*/
 GapBuffer::iterator::iterator(vec_char_iter beg, vec_char_iter end, vec_char_iter p, size_type* gap_s, size_type* gap_e) : data_beg(beg), data_end(end), ptr(p), gap_start(gap_s), gap_end(gap_e) {
 	if (BelongsToBuffer(*this, p))
 		++(*this);
 }
 
-//Prefix increment
+/**
+* @brief Prefix increment.
+* @details We check can our iterator get into the gap space after the increment and if it is we try to skip the space.
+* @throws std::out_of_range thrown if `ptr` will be out of range after the increment.
+*/
  GapBuffer::iterator& GapBuffer::iterator::operator++() {
 	 if (IsIterOutOfRange(*this, ptr, '+', 1))
 		 ThrowOutOfRange();
@@ -28,14 +39,22 @@ GapBuffer::iterator::iterator(vec_char_iter beg, vec_char_iter end, vec_char_ite
 	return *this;
 }
 
-//Postfix increment
+ /**
+ * @brief Postfix increment.
+ * @see GapBuffer::iterator::operator++().
+ * @throws std::out_of_range thrown if `ptr` will be out of range after the increment.
+ */
  GapBuffer::iterator GapBuffer::iterator::operator++(int junk) {
 	iterator ret(*this);
 	++*this;
 	return ret;
 }
 
-//Prefix decrement
+ /**
+ * @brief Prefix decrement.
+ * @details We check can our iterator get into the gap space after the decrement and if it is we try to skip the space.
+ * @throws std::out_of_range thrown if `ptr` will be out of range after the decrement.
+ */
 GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	if (IsIterOutOfRange(*this, ptr, '-', 1))
 		ThrowOutOfRange();
@@ -52,14 +71,23 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	return *this;
 }
 
-//Postfix decrement
+/**
+* @brief Postfix decrement.
+* @see GapBuffer::iterator::operator--().
+* @throws std::out_of_range thrown if `ptr` will be out of range after the decrement.
+*/
  GapBuffer::iterator GapBuffer::iterator::operator--(int junk) {
 	iterator ret(*this);
 	--(*this);
 	return ret;
 }
 
-//Distance between iterators including correct negative distance
+ /**
+ * @brief Calculate a distance between current iterator object and `rhs`.
+ * @details We calcualte the distance considering gap space size and the absolute distance value between iterators.
+ * @param rhs - iterator the distance to which we are looking for.
+ * @return std::ptrdiff_t - absolute value of distance between iterators.
+ */
  GapBuffer::iterator::difference_type GapBuffer::iterator::operator-(const iterator& rhs) const {
 	std::ptrdiff_t distance = ptr - rhs.ptr;
 	//If the buffer between iterators we must subtract its length
@@ -75,7 +103,11 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	return distance;
 }
 
-//Positive shift iterator
+ /**
+* @brief operator+ shifts iterator `inc` further.
+* @details We check can our iterator get into the gap space after the shift and if it is we try to skip the space.
+* @throws std::out_of_range thrown if iterator will be out of range after the shift.
+*/
  GapBuffer::iterator GapBuffer::iterator::operator+(size_type inc) const {
 	iterator ret_iter(*this);
 	 if (IsIterOutOfRange(*this, ptr, '+', inc))
@@ -95,7 +127,11 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 	 return ret_iter;
 }
 
-//Negative shift iterator
+ /**
+ * @brief operator- shifts iterator `inc` backward.
+ * @details We check can our iterator get into the gap space after the shift and if it is we try to skip the space.
+ * @throws std::out_of_range thrown if iterator will be out of range after the shift.
+ */
  GapBuffer::iterator GapBuffer::iterator::operator-(size_type dec) const {
 	 iterator ret_iter(*this);
 	 if (IsIterOutOfRange(*this, ptr, '-', dec))
@@ -130,11 +166,7 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 }
 
  GapBuffer::iterator& GapBuffer::iterator::operator=(const iterator& rhs) {
-	data_beg = rhs.data_beg;
-	data_end = rhs.data_end;
-	ptr = rhs.ptr;
-	gap_start = rhs.gap_start;
-	gap_end = rhs.gap_end;
+	tie(data_beg, data_end, ptr, gap_start, gap_end) = tie(rhs.data_beg, rhs.data_end, rhs.ptr, rhs.gap_start, rhs.gap_end);
 
 	return *this;
 }

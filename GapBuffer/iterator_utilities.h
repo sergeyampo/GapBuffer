@@ -3,6 +3,14 @@
 
 //Recieves iterator, type of shift and shift constant. It checks will the
 //iterator skip the gap after such shift.
+/**
+* @brief Checks will the iterator skip the gap after such shift.
+* @tparam GAPIt - GapBuffer::const_iterator or GapBuffer::iterator
+* @param it - GapBuffer iterator object.
+* @param action - '+' or '-' character.
+* @param shift - number of elements	`it` should be shifted.
+* @return bool - the status whether iterator skip the gap space after the shift.
+*/
 template <typename GAPIt>
 inline bool WillSkipGap(GAPIt it, const char& action, const int& shift){
 	//Exclude an empty gap case
@@ -32,6 +40,14 @@ inline bool WillSkipGap(GAPIt it, const char& action, const int& shift){
 
 //Recieves base GapBuffer iterator and its vector<char>::(const_)iterator and check
 //if the iterator belongs to GapBuffer.
+/**
+* @brief Checks is the iteator object is in a gap space.
+* @tparam GAPIt - GapBuffer::const_iterator or GapBuffer::iterator.
+* @tparam Iter - vector<char>::const_iterator or vector<char>::iterator.
+* @param base - GapBuffer iterator object.
+* @param p - vector<char> iterator object.
+* @return bool - the status whether the iterator got into the gap space.
+*/
 template <typename GAPIt, typename Iter>
 bool BelongsToBuffer(GAPIt base, Iter p){
 	auto gap_start_it = base.data_beg + *(base.gap_start);
