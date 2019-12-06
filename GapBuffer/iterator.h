@@ -55,16 +55,16 @@ class GapBuffer::iterator {
 	bool operator>=(const iterator& rhs) const { return ptr >= rhs.ptr; }
 
 	///Function tells us may our action of moving iterator cause out of range exception throwing.
-	template<typename GAPIt, typename It>
+	template<typename GAPIt, typename It, typename, typename>
 	friend bool IsIterOutOfRange<GAPIt, It>(GAPIt, It, const char&, const int&);
 	
 	///Function tells us will we skip the gap if move our iterator.
-	template<typename GAPIt>
+	template<typename GAPIt, typename>
 	friend bool WillSkipGap<GAPIt>(GAPIt, const char&, const int&);
 
   private:
 	///Function tells us is our GapBuffer::iterator got into the gap space.
-	template <typename GAPIt, typename Iter>
+	template <typename GAPIt, typename Iter, typename, typename>
 	friend bool BelongsToBuffer(GAPIt, Iter);
 
   private:
