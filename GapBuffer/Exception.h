@@ -1,6 +1,7 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
+#include "TypeSet.h"
 #include <stdexcept>
 #include <functional>
 #include <cmath>
@@ -20,14 +21,16 @@ inline void ThrowOutOfRange() noexcept(false) {
 * Nevertheless this function processes such occasions.
 * Recieves instruction like: IsIterOutOfRange(GapBuffer::(const_)iterator, vector<char>::(const_)iterator belongs to first argument, '+'('-'), 10(number))
 * @tparam GAPIt - GapBuffer::const_iterator or GapBuffer::iterator.
-* @tparam It - vector<char>::const_iterator or vector<char>::iterator.
+* @tparam Iter - vector<char>::const_iterator or vector<char>::iterator.
 * @param base - GapBuffer::iterator or const_iterator object keeping `iter` iterator.
 * @param act - '+' or '-' character.
 * @param shift - number of elements	`iter` should be shifted.
 * @return bool - the status of whether the shift wil be successful.
 */
-template<typename GAPIt, typename It>
-inline bool IsIterOutOfRange(GAPIt base, It iter, const char& act, const int& shift) {
+template<typename GAPIt, typename Iter,
+	     typename = std::enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>,
+	     typename = enable_if_t<is_vec_iter<Iter>::value, Iter> >
+inline bool IsIterOutOfRange(GAPIt base, Iter iter, const char& act, const int& shift) {
 	auto NegatShift = [&](const int& shf) -> bool {
 		if (shf > std::distance(base.data_beg, iter))
 			return true;
