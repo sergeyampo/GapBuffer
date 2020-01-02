@@ -179,7 +179,7 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 }
 
  GapBuffer::const_iterator::pointer GapBuffer::const_iterator::operator->() const {
-	return &(*ptr);
+	return addressof(*ptr);
 }
 
 

@@ -221,7 +221,7 @@ void GapBuffer::RemoveRange(const size_type& beg, const size_type& end) {
 * @return GapBuffer::const_iterator
 */
 GapBuffer::const_iterator GapBuffer::begin() const {
-	return { std::cbegin(data), std::cend(data), std::cbegin(data), const_cast<size_type*>(&gap_start), const_cast<size_type*>(&gap_end) };
+	return { std::cbegin(data), std::cend(data), std::cbegin(data), const_cast<size_type*>(addressof(gap_start)), const_cast<size_type*>(addressof(gap_end)) };
 }
 
 /**
@@ -232,7 +232,7 @@ GapBuffer::const_iterator GapBuffer::begin() const {
 * @return GapBuffer::const_iterator
 */
 GapBuffer::const_iterator GapBuffer::end() const {
-	return { std::cbegin(data), std::cend(data), std::find(std::execution::par_unseq, std::cbegin(data), std::cend(data), '\0'), const_cast<size_type*>(&gap_start), const_cast<size_type*>(&gap_end) };
+	return { std::cbegin(data), std::cend(data), std::find(std::execution::par_unseq, std::cbegin(data), std::cend(data), '\0'), const_cast<size_type*>(addressof(gap_start)), const_cast<size_type*>(addressof(gap_end)) };
 }
 
 /**
@@ -241,7 +241,7 @@ GapBuffer::const_iterator GapBuffer::end() const {
 * @return GapBuffer::iterator
 */
 GapBuffer::iterator GapBuffer::begin() {
-	return { std::begin(data), std::end(data), std::begin(data), &gap_start, &gap_end };
+	return { std::begin(data), std::end(data), std::begin(data), addressof(gap_start), addressof(gap_end) };
 }
 
 /**
@@ -252,5 +252,5 @@ GapBuffer::iterator GapBuffer::begin() {
 * @return GapBuffer::iterator
 */
 GapBuffer::iterator GapBuffer::end() {
-	return { std::begin(data), std::end(data), std::find(std::begin(data), std::end(data), '\0'), &gap_start, &gap_end };
+	return { std::begin(data), std::end(data), std::find(std::begin(data), std::end(data), '\0'), addressof(gap_start), addressof(gap_end) };
 }

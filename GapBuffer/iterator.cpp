@@ -176,6 +176,6 @@ GapBuffer::iterator& GapBuffer::iterator::operator--() {
 }
 
  GapBuffer::iterator::pointer GapBuffer::iterator::operator->() const {
-	return &(*ptr);
+	return addressof(*ptr);
 }
 
