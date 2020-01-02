@@ -30,15 +30,15 @@ inline void ThrowOutOfRange() noexcept(false) {
 template<typename GAPIt, typename Iter,
 	     typename = std::enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>,
 	     typename = enable_if_t<is_vec_iter<Iter>::value, Iter> >
-inline bool IsIterOutOfRange(GAPIt base, Iter iter, const char& act, const int& shift) {
-	auto NegatShift = [&](const int& shf) -> bool {
+inline bool IsIterOutOfRange(GAPIt base, Iter iter, const char& act, const int64_t& shift) {
+	auto NegatShift = [&](const int64_t& shf) -> bool {
 		if (shf > std::distance(base.data_beg, iter))
 			return true;
 
 		return false;
 	};
 
-	auto PositShift = [&](const int& shf) -> bool {
+	auto PositShift = [&](const int64_t& shf) -> bool {
 		if (shf > std::distance(iter, base.data_end))
 			return true;
 		else if (iter + shf > std::find(base.data_beg, base.data_end, '\0'))

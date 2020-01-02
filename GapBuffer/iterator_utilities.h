@@ -12,7 +12,7 @@
 * @return bool - the status whether iterator skip the gap space after the shift.
 */
 template <typename GAPIt, typename = std::enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>>
-inline bool WillSkipGap(GAPIt it, const char& action, const int& shift){
+inline bool WillSkipGap(GAPIt it, const char& action, const int64_t& shift){
 	//Exclude an empty gap case
 	if (*(it.gap_start) == *(it.gap_end))
 		return false;
@@ -20,8 +20,8 @@ inline bool WillSkipGap(GAPIt it, const char& action, const int& shift){
 	auto gps_iter = it.data_beg + *(it.gap_start);
 	auto gpe_iter = it.data_beg + *(it.gap_end);
 
-	auto PositGapSkip = [&](const int& shf) { return it.ptr < gps_iter && it.ptr + shf >= gpe_iter; };
-	auto NegatGapSkip = [&](const int& shf) { return it.ptr >= gpe_iter && it.ptr - shf < gps_iter; };
+	auto PositGapSkip = [&](const int64_t& shf) { return it.ptr < gps_iter && it.ptr + shf >= gpe_iter; };
+	auto NegatGapSkip = [&](const int64_t& shf) { return it.ptr >= gpe_iter && it.ptr - shf < gps_iter; };
 
 	if (action == '+')
 		if (shift > 0)

@@ -4,6 +4,7 @@
 #include "GapBuffer.h"
 #include "Exception.h"
 #include "iterator_utilities.h"
+#include <stdint.h>
 #include <vector>
 
 /** 
@@ -57,11 +58,11 @@ class GapBuffer::const_iterator {
 
 	///Function tells us may our action of moving iterator cause out of range exception throwing.
 	template<typename GAPIt, typename It, typename, typename>
-	friend bool IsIterOutOfRange<GAPIt, It>(GAPIt, It, const char&, const int&);
+	friend bool IsIterOutOfRange<GAPIt, It>(GAPIt, It, const char&, const int64_t&);
 	
 	///Function tells us will we skip the gap if move our iterator.
 	template<typename GAPIt, typename>
-	friend bool WillSkipGap<GAPIt>(GAPIt, const char&, const int&);
+	friend bool WillSkipGap<GAPIt>(GAPIt, const char&, const int64_t&);
 
   private:
 	///Function tells us is our GapBuffer::const_iterator got into the gap space.
