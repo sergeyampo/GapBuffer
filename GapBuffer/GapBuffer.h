@@ -130,6 +130,8 @@ class GapBuffer {
 template <typename It>
 GapBuffer::GapBuffer(It beg, It end) {
 	gap_start = gap_end = end - beg;
+	data.reserve(gap_start);
+
 	while (beg != end)
 		data.emplace_back(*beg++);
 }
