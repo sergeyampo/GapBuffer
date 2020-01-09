@@ -1,7 +1,7 @@
 #include "const_iterator.h"
-#include "GapBuffer.h"
-#include "Exception.h"
-#include "iterator_utilities.h"
+#include "../GapBuffer.h"
+#include "../utils/Exception.h"
+#include "../utils/iterator_utilities.h"
 #include <algorithm>
 #include <tuple>
 

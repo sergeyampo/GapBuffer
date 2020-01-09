@@ -1,6 +1,6 @@
 #include "GapBuffer.h"
-#include "iterator.h"
-#include "const_iterator.h"
+#include "./iterators/iterator.h"
+#include "./iterators/const_iterator.h"
 #include <algorithm>
 #include <stdexcept>
 #include <execution>

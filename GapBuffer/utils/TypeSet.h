@@ -1,7 +1,7 @@
 #ifndef GUARD_TYPESET_H
 #define GUARD_TYPESET_H
 
-#include "GapBuffer.h"
+#include "../GapBuffer.h"
 #include <type_traits>
 #include <vector>
 
