@@ -43,7 +43,11 @@ GapBuffer::iterator GapBuffer::ConstIterToIter(GapBuffer::const_iterator citer) 
 */
 void GapBuffer::GapMoveLeft(const size_type& index) {
 	auto beg = std::begin(data) + index;
-	copy(std::execution::par_unseq, beg, beg + (gap_start - index), beg + GapSize());
+	if(StorageSize() > 5000)
+		copy(std::execution::par_unseq, beg, beg + (gap_start - index), beg + GapSize());
+	else
+		copy(beg, beg + (gap_start - index), beg + GapSize());
+	
 	gap_end -= (gap_start - index);
 	gap_start = index;
 }
@@ -55,7 +59,11 @@ void GapBuffer::GapMoveLeft(const size_type& index) {
 */
 void GapBuffer::GapMoveRight(const size_type& index) {
 	auto beg = std::begin(data);
-	copy(std::execution::par_unseq, beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
+	if(StorageSize() > 5000)
+	  copy(std::execution::par_unseq, beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
+	else
+	  copy(beg + gap_end, beg + index + (index - gap_end), beg + gap_start);
+
 	gap_start += (index - gap_end);
 	gap_end = index;
 }
