@@ -8,23 +8,19 @@
 using namespace std;
 
 //По умолчанию типы false
-template <typename T>
-struct is_gap : std::false_type { };
-
+//template <typename T>
+//struct is_gap : std::false_type { };
+//
 //Перегружаем шаблон так, что для GapBuffer он теперь true.
-template <>
-struct is_gap<GapBuffer> : std::true_type {};
-
-template <typename T, class = enable_if_t<is_gap<T>::value, T> >
-void make(const T& t) { return; }
+//template <>
+//struct is_gap<GapBuffer> : std::true_type {};
+//
+//template <typename T, class = enable_if_t<is_gap<T>::value, T> >
+//void make(const T& t) { return; }
 
 
 int main() {
-	int a;
 	GapBuffer gp;
-	vector<char> v = {'a'};
-	BelongsToBuffer(gp.begin(), v.begin());
-	make(gp);
 	
 	return 0;
 }

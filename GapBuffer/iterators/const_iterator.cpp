@@ -33,8 +33,10 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 		++ptr;
 	else {
 		auto gpe_index = *gap_end;
-		IsIterOutOfRange(*this, data_beg, '+', gpe_index) ? ThrowOutOfRange() 
-			                                  : (ptr = data_beg + gpe_index);
+		if(IsIterOutOfRange(*this, data_beg, '+', gpe_index))
+			ThrowOutOfRange();
+	    else
+	    	ptr = data_beg + gpe_index;
 	}
 
 	return *this;
@@ -65,8 +67,10 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 	}
 	else{
 		auto gps_index = *gap_start;
-		IsIterOutOfRange(*this, data_beg, '+', gps_index-1) ? ThrowOutOfRange()
-			                                                : (ptr = data_beg + gps_index - 1);
+		if(IsIterOutOfRange(*this, data_beg, '+', gps_index-1))
+			ThrowOutOfRange();
+	    else
+	    	ptr = data_beg + gps_index - 1;
 	}
 
 	return *this;
@@ -124,7 +128,10 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 	else {
 		size_type shift = std::distance(data_beg, ret_iter.ptr) + inc - (*gap_start);
 		auto gpe_index = *gap_end;
-	    IsIterOutOfRange(*this, data_beg, '+', gpe_index + shift) ? ThrowOutOfRange() : (ret_iter.ptr = data_beg + gpe_index + shift);
+	    if(IsIterOutOfRange(*this, data_beg, '+', gpe_index + shift))
+	      ThrowOutOfRange();
+	    else
+	      ret_iter.ptr = data_beg + gpe_index + shift;
 	}
 
 	return ret_iter;
@@ -149,7 +156,10 @@ GapBuffer::const_iterator::const_iterator(vec_char_citer beg, vec_char_citer end
 	else {
 		size_t shift = std::distance(ptr - dec, data_beg + (*gap_end));
         auto gps_index = *gap_start;
-        IsIterOutOfRange(*this, data_beg, '+', gps_index-shift) ? ThrowOutOfRange() : (ret_iter.ptr = data_beg + (gps_index - shift));
+        if(IsIterOutOfRange(*this, data_beg, '+', gps_index-shift))
+          ThrowOutOfRange();
+        else 
+          ret_iter.ptr = data_beg + (gps_index - shift);
 	}
 
 	return ret_iter;
