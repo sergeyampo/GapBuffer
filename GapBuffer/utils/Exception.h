@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <functional>
 #include <cmath>
-#include <algorithm>
-#include <type_traits>
 
 /**
 * @brief Throws out of range exception.
@@ -31,7 +29,7 @@ inline void ThrowOutOfRange() noexcept(false) {
 */
 template<typename GAPIt, typename Iter,
 	     typename = std::enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>,
-	     typename = std::enable_if_t<is_vec_iter<Iter>::value, Iter> >
+	     typename = enable_if_t<is_vec_iter<Iter>::value, Iter> >
 inline bool IsIterOutOfRange(GAPIt base, Iter iter, const char& act, const int64_t& shift) {
 	auto NegatShift = [&](const int64_t& shf) -> bool {
 		if (shf > std::distance(base.data_beg, iter))
