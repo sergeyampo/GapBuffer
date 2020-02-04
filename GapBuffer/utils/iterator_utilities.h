@@ -2,6 +2,7 @@
 #define ITERATOR_UTILITIES_H
 
 #include "TypeSet.h"
+#include <type_traits>
 
 /**
 * @brief Checks will the iterator skip the gap after such shift.
@@ -49,8 +50,8 @@ inline bool WillSkipGap(GAPIt it, const char& action, const int64_t& shift){
 * @return bool - the status whether the iterator got into the gap space.
 */
 template <typename GAPIt, typename Iter,
-	      typename = enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>,
-	      typename = enable_if_t<is_vec_iter<Iter>::value, Iter> >
+	      typename = std::enable_if_t<is_gap_iter<GAPIt>::value, GAPIt>,
+	      typename = std::enable_if_t<is_vec_iter<Iter>::value, Iter> >
 bool BelongsToBuffer(GAPIt base, Iter p){
 	auto gap_start_it = base.data_beg + *(base.gap_start);
 	auto gap_end_it = base.data_beg + *(base.gap_end);
