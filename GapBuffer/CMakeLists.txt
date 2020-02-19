@@ -21,6 +21,8 @@ add_subdirectory(${GAP_BUFFER})
 
 add_subdirectory(./tests)
 
+add_subdirectory(./docs)
+
 target_link_libraries(Editor GapBufferLib)
 
 install(TARGETS Editor DESTINATION ./bin)
