@@ -1,0 +1,26 @@
+language: cpp
+compiler: gcc
+sudo: false
+dist: xenial
+
+before_install:
+  - sudo apt-get update
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
+install:
+    - source install-linux.sh
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+      env:
+        - MATRIX_EVAL="CC=gcc-9 CXX=g++-9"
+script: 
+  - cmake CMakeLists.txt
+  - cmake --build .

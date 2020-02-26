@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "../GapBuffer/GapBuffer.h"
-#include "../GapBuffer/iterators/iterator.h"
-#include "../GapBuffer/iterators/const_iterator.h"
+#include "../GapBuffer/GapBuffer/GapBuffer.h"
+#include "../GapBuffer/GapBuffer/iterators/iterator.h"
+#include "../GapBuffer/GapBuffer/iterators/const_iterator.h"
 #include <string>
 #include <vector>
 #include <numeric>
