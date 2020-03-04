@@ -6,6 +6,7 @@ dist: xenial
 before_install:
   - sudo apt-get update
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+  - pip install --user cpp-coveralls
 
 install:
     - source install-linux.sh
@@ -25,3 +26,7 @@ script:
   - cd GapBuffer
   - cmake CMakeLists.txt
   - cmake --build .
+  - ./test/TestGapBuffer
+
+after_success:
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*tests/.*.cpp.*"
