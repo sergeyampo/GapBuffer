@@ -10,7 +10,7 @@
 
 using namespace std;
 
-//Test fixture class for GapBuffer
+//Test fixture class for a GapBuffer class
 class GapBufferTest : public ::testing::Test {
 protected:
 	void SetUp() override {
