@@ -26,7 +26,8 @@ script:
   - cd GapBuffer
   - cmake CMakeLists.txt
   - cmake --build .
-  - ./test/TestGapBuffer
+  - cd test 
+  - ./TestGapBuffer
 
 after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*tests/.*.cpp.*"
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*cpp.*"
