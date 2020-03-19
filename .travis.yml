@@ -1,12 +1,11 @@
 language: cpp
 compiler: gcc
-sudo: false
 dist: xenial
 
 before_install:
-  - apt-get update
-  - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-  - pip install --user cpp-coveralls
+  - sudo apt-get update
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+  - sudo pip install --user cpp-coveralls
 
 install:
     - source install-linux.sh
