@@ -3,11 +3,6 @@ compiler: gcc
 dist: xenial
 os: linux
 
-before_install:
-  - sudo apt-get update
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-  - sudo pip install --user cpp-coveralls
-
 install:
     - source install-linux.sh
 
@@ -15,6 +10,10 @@ jobs:
   include:
     - stage: Start&Test
     - os: linux
+      before_install:
+        - sudo apt-get update
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+        - sudo pip install --user cpp-coveralls
       addons:
         apt:
           sources:
