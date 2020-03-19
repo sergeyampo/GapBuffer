@@ -1,17 +1,11 @@
 language: cpp
-compiler: gcc
-dist: xenial
+os: linux
 
 jobs:
   include:
-    - stage: Start&Test
     - os: linux
-      before_install:
-        - sudo apt-get update
-        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-        - sudo pip install --user cpp-coveralls
-      install:
-        - source install-linux.sh
+      compiler: gcc
+      dist: xenial
       addons:
         apt:
           sources:
@@ -20,28 +14,38 @@ jobs:
             - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 CXX=g++-9"
+        - TASK="Build GapBuffer and test it."
+      before_install:
+        - sudo apt-get update
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+        - sudo pip install --user cpp-coveralls
+      install:
+        - source install-linux.sh
       script: 
         - cd GapBuffer
         - cmake CMakeLists.txt
         - cmake --build .
         - cd tests 
         - ./TestGapBuffer
-
       after_success:
         - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*" -E "./GapBuffer/tests/*cc.*"
-  include:  
-    - stage: docs
+
     - os: linux
+      compiler: gcc
+      dist: xenial     
       addons:
         - doxygen
         - doxygen-doc
         - doxygen-gui
         - doxygen-latex
         - graphviz
-        - tree   
+        - tree
+      env:
+        - TASK="Generate documentation for the GapBuffer."        
       install: true    
       script: 
-      - cd GapBuffer/docs
+      - cd GapBuffer
+      - cd docs
       - cmake --build . --target doc
       - cd compiled_docs
       - tree
