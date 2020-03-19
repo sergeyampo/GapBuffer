@@ -56,6 +56,6 @@ jobs:
       script: 
       - cd GapBuffer
       - cmake CMakeLists.txt
-      - cmake --build . -- -j 2
-      - cd docs/compiled_docs
+      - cmake --build . --target doc -j 2
+      - cd ./docs/compiled_docs
       - tree
