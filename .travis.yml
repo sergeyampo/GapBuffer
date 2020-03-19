@@ -4,8 +4,8 @@ sudo: false
 dist: xenial
 
 before_install:
-  - sudo apt-get update
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+  - apt-get update
+  - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
   - pip install --user cpp-coveralls
 
 install:
@@ -30,4 +30,4 @@ script:
   - ./TestGapBuffer
 
 after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*"
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*" -E "./GapBuffer/tests/*cc.*"
