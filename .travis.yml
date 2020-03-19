@@ -41,8 +41,11 @@ jobs:
         - graphviz
         - tree
       env:
-        - TASK="Generate documentation for the GapBuffer."        
-      install: true    
+        - TASK="Generate documentation for the GapBuffer."
+      before_install:
+        - sudo apt-get update             
+      install:
+        - source install-linux.sh 
       script: 
       - cd GapBuffer
       - cd docs
