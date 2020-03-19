@@ -30,4 +30,4 @@ script:
   - ./TestGapBuffer
 
 after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*cpp.*"
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*"
