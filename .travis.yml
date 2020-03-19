@@ -3,9 +3,6 @@ compiler: gcc
 dist: xenial
 os: linux
 
-install:
-    - source install-linux.sh
-
 jobs:
   include:
     - stage: Start&Test
@@ -14,6 +11,8 @@ jobs:
         - sudo apt-get update
         - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
         - sudo pip install --user cpp-coveralls
+      install:
+        - source install-linux.sh
       addons:
         apt:
           sources:
