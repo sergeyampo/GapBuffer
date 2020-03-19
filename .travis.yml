@@ -1,6 +1,7 @@
 language: cpp
 compiler: gcc
 dist: xenial
+os: linux
 
 before_install:
   - sudo apt-get update
@@ -10,8 +11,9 @@ before_install:
 install:
     - source install-linux.sh
 
-matrix:
+jobs:
   include:
+    - stage: Start&Test
     - os: linux
       addons:
         apt:
@@ -21,12 +23,28 @@ matrix:
             - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 CXX=g++-9"
-script: 
-  - cd GapBuffer
-  - cmake CMakeLists.txt
-  - cmake --build .
-  - cd tests 
-  - ./TestGapBuffer
+      script: 
+        - cd GapBuffer
+        - cmake CMakeLists.txt
+        - cmake --build .
+        - cd tests 
+        - ./TestGapBuffer
 
-after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*" -E "./GapBuffer/tests/*cc.*"
+      after_success:
+        - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E "./GapBuffer/tests/*cpp.*" -E "./GapBuffer/tests/*h.*" -E "./GapBuffer/tests/*cc.*"
+    
+    - stage: docs
+    - os: linux
+      addons:
+        - doxygen
+        - doxygen-doc
+        - doxygen-gui
+        - doxygen-latex
+        - graphviz
+        - tree   
+      install: true    
+      script: 
+      - cd GapBuffer/docs
+      - cmake --build . --target doc
+      - cd compiled_docs
+      - tree
