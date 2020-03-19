@@ -24,7 +24,7 @@ jobs:
       script: 
         - cd GapBuffer
         - cmake CMakeLists.txt
-        - cmake --build .
+        - cmake --build . -- -j 2
         - cd tests 
         - ./TestGapBuffer
       after_success:
@@ -32,15 +32,21 @@ jobs:
 
     - os: linux
       compiler: gcc
-      dist: xenial     
+      dist: xenial
       addons:
-        - doxygen
-        - doxygen-doc
-        - doxygen-gui
-        - doxygen-latex
-        - graphviz
-        - tree
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+            - doxygen
+            - doxygen-doc
+            - doxygen-gui
+            - doxygen-latex
+            - graphviz
+            - tree         
       env:
+        - MATRIX_EVAL="CC=gcc-9 CXX=g++-9"
         - TASK="Generate documentation for the GapBuffer."
       before_install:
         - sudo apt-get update             
@@ -48,7 +54,7 @@ jobs:
         - source install-linux.sh 
       script: 
       - cd GapBuffer
-      - cd docs
-      - cmake --build . --target doc
-      - cd compiled_docs
+      - cmake CMakeLists.txt
+      - cmake --build . -- -j 2
+      - cd docs/compiled_docs
       - tree
